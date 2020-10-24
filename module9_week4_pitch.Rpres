@@ -1,0 +1,64 @@
+Reproducible Pitch Presentation
+========================================================
+author: YONGXIAO ZHOU
+date: 10/24/2020
+autosize: true
+
+General Overview
+========================================================
+
+This app takes the "mtcars" data, and subsets the data according to the cylinders numbers user input. Then the app calculates the linear regression model based on horse power (hp) and milage per gallon (mpg). It outputs a plot with both scatter plot of original horse power Vs. MPG data (black circles) and the fitting line (red).
+
+- User input
+- Server calculation
+- Plot output
+
+Slide With UI Code
+========================================================
+
+```{r}
+library(shiny)
+shinyUI(fluidPage(
+    titlePanel("Predict Linear Model for MPG for Specific Cylinder"),
+    sidebarLayout(
+        sidebarPanel(
+            h4('Please change the number of cylinders, the App calculates the linear regression model between the horse power and MPG data 
+               from mtcars data set, the our put is the scatter plot of horsepower Vs. MPG, and the linear model is in red color'),
+            numericInput("cylin", "Number of cylinders:", min = 4, max = 8, value = 4, step = 2)),
+        mainPanel(plotOutput("plot1"))
+    )
+))
+```
+
+Slide With Server Code
+========================================================
+```{r}
+library(shiny)
+shinyServer(function(input, output) {
+
+    output$plot1 <- renderPlot({
+        cc <- input$cylin
+        newmt <- mtcars[mtcars$cyl == cc, c(1,4)]
+        fit1 <- lm(mpg ~ hp, data = newmt)
+        hp <- seq(0, max(newmt$hp)+50)
+        x <- data.frame(hp)
+        y <- predict(fit1, x)
+        plot(newmt$hp, newmt$mpg, col = "black", xlab = 'Horse Power', ylab = "MPG")
+        lines(x$hp,y, col = 'red')
+        })
+    })
+```
+
+Slide With Plot
+========================================================
+This is an example of the plot when input value is 4
+```{r, echo=FALSE}
+        cc <- 4
+        newmt <- mtcars[mtcars$cyl == cc, c(1,4)]
+        fit1 <- lm(mpg ~ hp, data = newmt)
+        hp <- seq(0, max(newmt$hp)+50)
+        x <- data.frame(hp)
+        y <- predict(fit1, x)
+        plot(newmt$hp, newmt$mpg, col = "black", xlab = 'Horse Power', ylab = "MPG")
+        lines(x$hp,y, col = 'red')
+```
